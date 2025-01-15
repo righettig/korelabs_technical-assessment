@@ -20,15 +20,9 @@ export class ProductService {
   }
 
   async findAll() {
-    const products: ProductWithTasks[] = await this._repository.find();
-
-    for (const product of products) {
-      product.tasks = await this._taskRepository.find({
-        where: { product: { id: product.id } },
-      });
-    }
-
-    return products;
+    return this._repository.find({
+      relations: ['tasks'], // Automatically loads tasks with each product
+    });
   }
 
   findOne(id: string) {

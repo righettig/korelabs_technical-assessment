@@ -3,13 +3,14 @@ import { ActivatedRoute } from '@angular/router';
 import { Product, ProductsService } from '../../services/products.service';
 import { Observable, map } from 'rxjs';
 import { AsyncPipe, DatePipe, KeyValuePipe, NgFor, NgIf } from '@angular/common';
-import { TasksService } from '../../services/tasks.service';
+import { Task, TasksService } from '../../services/tasks.service';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [NgIf, NgFor, AsyncPipe, DatePipe, KeyValuePipe, ConfirmationDialogComponent],
+  imports: [NgIf, NgFor, AsyncPipe, DatePipe, KeyValuePipe, ConfirmationDialogComponent, FormsModule],
   templateUrl: './product.component.html',
   styleUrl: './product.component.scss',
 })
@@ -18,6 +19,14 @@ export class ProductComponent implements OnInit {
 
   showConfirmationDialog = false;
   taskToBeDeleted: string | undefined = undefined;
+
+  showCreateTaskModal = false;
+  newTask: Task = {
+    title: '',
+    description: '',
+    dueAt: '',
+    productId: ''
+  };
 
   constructor(
     private _route: ActivatedRoute,
@@ -62,5 +71,25 @@ export class ProductComponent implements OnInit {
   onDeleteTaskCancelled() {
     this.taskToBeDeleted = undefined;
     this.showConfirmationDialog = false;
+  }
+
+  openCreateTaskModal () {
+    this.showCreateTaskModal = true;
+  }
+
+  addTask() {
+    if (this.product$) {
+      this.product$.subscribe(product => {
+        product.tasks.push({ ...this.newTask, id: '' });
+        
+        this._taskService.create({ ...this.newTask, productId: product.id }).subscribe(() => {
+          this.closeTaskModal();
+        });
+      });
+    }
+  }
+
+  closeTaskModal() {
+    this.showCreateTaskModal = false;
   }
 }

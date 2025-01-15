@@ -5,13 +5,17 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { ProductProperty } from './entities/product-property.entity';
 
 describe('ProductService', () => {
   let service: ProductService;
   let repository: Repository<Product>;
+  let propertiesRepository: Repository<ProductProperty>;
 
   beforeEach(async () => {
     const repositoryToken = getRepositoryToken(Product);
+    const propertiesRepositoryToken = getRepositoryToken(ProductProperty);
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProductService,
@@ -25,11 +29,22 @@ describe('ProductService', () => {
             delete: jest.fn(),
           },
         },
+        {
+          provide: propertiesRepositoryToken,
+          useValue: {
+            save: jest.fn(),
+            find: jest.fn(),
+            findOneBy: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn(),
+          },
+        },
       ],
     }).compile();
 
     service = module.get<ProductService>(ProductService);
     repository = module.get<Repository<Product>>(repositoryToken);
+    propertiesRepository = module.get<Repository<ProductProperty>>(repositoryToken);
   });
 
   it('should be defined', () => {

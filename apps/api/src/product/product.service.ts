@@ -51,7 +51,7 @@ export class ProductService {
     });
 
     // making sure return format is the same as before
-    const result = data.map(item => {
+    const result = data?.map(item => {
       const propertiesObj = item.properties.reduce((acc, { key, value }) => {
         acc[key] = value;
         return acc;

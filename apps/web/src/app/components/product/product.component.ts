@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Product, ProductsService } from '../../services/products.service';
-import { Observable, map } from 'rxjs';
+import { Observable, map, switchMap } from 'rxjs';
 import { AsyncPipe, DatePipe, KeyValuePipe, NgFor, NgIf } from '@angular/common';
 import { Task, TasksService } from '../../services/tasks.service';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
@@ -39,8 +39,7 @@ export class ProductComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    const id = this._route.snapshot.paramMap.get('id');
-    this.loadProduct(id!);
+    this.reloadCurrentProduct();
   }
 
   loadProduct(id: string) {
@@ -60,67 +59,59 @@ export class ProductComponent implements OnInit {
     this.taskToBeDeleted = id;
   }
 
-  onDeleteTaskConfirmed() {
-    this._taskService
-      .delete(this.taskToBeDeleted!)
-      .subscribe(() => {
-        this.taskToBeDeleted = undefined;
-        this.showConfirmationDialog = false;
-
-        const id = this._route.snapshot.paramMap.get('id');
-        this.loadProduct(id!);
-      })
-  }
-
-  onDeleteTaskCancelled() {
-    this.taskToBeDeleted = undefined;
-    this.showConfirmationDialog = false;
-  }
-
-  openTaskModal(task: Task | null = null, index: number | null = null, event: Event | null = null): void {
-    if (task) {
-      event!.stopPropagation();
-
-      this.isEditing = true;
-      this.taskIndex = index;
-      this.newTask = task; // Prepopulate form with selected task
-      
-    } else {
-      this.isEditing = false;
-      this.taskIndex = null;
-      this.newTask = {     
-        title: '',
-        description: '',
-        dueAt: '',
-        productId: '' 
-      }; // Clear form
+  onDeleteTaskConfirmed(): void {
+    if (this.taskToBeDeleted) {
+      this._taskService.delete(this.taskToBeDeleted).subscribe(() => {
+        this.resetConfirmationDialog();
+        this.reloadCurrentProduct();
+      });
     }
+  }
+
+  onDeleteTaskCancelled(): void {
+    this.resetConfirmationDialog();
+  }
+
+  openTaskModal(task: Task | null = null, index: number | null = null, event?: Event): void {
+    event?.stopPropagation();
+    this.isEditing = !!task;
+    this.taskIndex = index;
+    this.newTask = task ? { ...task } : this.createEmptyTask();
     this.showTaskModal = true;
   }
 
-  closeTaskModal() {
+  closeTaskModal(): void {
     this.showTaskModal = false;
     this.taskIndex = null;
+    this.newTask = this.createEmptyTask();
   }
 
   saveTask(): void {
-    if (this.product$) {
-      this.product$.subscribe(product => {
-        if (this.isEditing && this.taskIndex !== null) {
-          this._taskService.update(this.newTask).subscribe(() => {
-            product.tasks[this.taskIndex!] = this.newTask;
-            this.closeTaskModal();
-          });
+    this.product$?.pipe(
+      switchMap(product => {
+        const taskOperation = this.isEditing && this.taskIndex !== null
+          ? this._taskService.update(this.newTask).pipe(
+              map(() => this.reloadCurrentProduct())
+            )
+          : this._taskService.create({ ...this.newTask, productId: product.id }).pipe(
+              map(() => this.reloadCurrentProduct())
+            );
+        return taskOperation;
+      })
+    ).subscribe(() => this.closeTaskModal());
+  }
 
-        } else {
-          this._taskService.create({ ...this.newTask, productId: product.id }).subscribe(el => {
-            const id = this._route.snapshot.paramMap.get('id');
-            this.loadProduct(id!);
+  private createEmptyTask(): Task {
+    return { title: '', description: '', dueAt: '', productId: '' };
+  }
 
-            this.closeTaskModal();
-          });
-        }
-      });
-    }
+  private resetConfirmationDialog(): void {
+    this.showConfirmationDialog = false;
+    this.taskToBeDeleted = undefined;
+  }
+
+  private reloadCurrentProduct(): void {
+    const id = this._route.snapshot.paramMap.get('id');
+    if (id) this.loadProduct(id);
   }
 }

@@ -11,11 +11,22 @@ export class TaskService {
   constructor(
     @InjectRepository(Task) private _repository: Repository<Task>,
     @InjectRepository(Product) private _productRepository: Repository<Product>,
-  ) {}
+  ) { }
 
   async create(createTaskDto: CreateTaskDto) {
-    // @fixme createTaskDto.productId is not being saved to the task
-    return this._repository.save(createTaskDto);
+    const { productId, ...taskData } = createTaskDto;
+
+    const task = this._repository.create(taskData);
+
+    if (productId) {
+      const product = await this._productRepository.findOneBy({ id: productId });
+      if (!product) {
+        throw new Error(`Product with ID ${productId} not found`);
+      }
+      task.product = product; // Set the relation
+    }
+
+    return this._repository.save(task);
   }
 
   findAll() {

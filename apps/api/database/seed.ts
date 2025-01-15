@@ -12,6 +12,7 @@ const db = new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
   entities: ['../**/*.{entity,view}.{js,ts}'],
+  //synchronize: true,
 });
 
 const seed = async () => {

@@ -12,7 +12,7 @@ const db = new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
   entities: ['../**/*.{entity,view}.{js,ts}'],
-  //synchronize: true,
+  //synchronize: true, // TODO: run migrations instead!
 });
 
 const seed = async () => {
@@ -27,7 +27,15 @@ const seed = async () => {
     for (let i = 0; i < 100; i++) {
       const product = new Product();
       product.name = `Product ${i}`;
-      product.properties = { description: `This is Product ${i}` };
+      
+      product.properties = [
+        { 
+          id: undefined,
+          key: 'description',
+          value: `This is Product ${i}`,
+          product
+        }
+      ]
 
       products.push(product);
     }

@@ -20,7 +20,7 @@ export class ProductComponent implements OnInit {
   showConfirmationDialog = false;
   taskToBeDeleted: string | undefined = undefined;
 
-  showCreateTaskModal = false;
+  showTaskModal = false;
   newTask: Task = {
     title: '',
     description: '',
@@ -28,11 +28,15 @@ export class ProductComponent implements OnInit {
     productId: ''
   };
 
+  isEditing: boolean = false;
+
+  taskIndex: number | null = null;
+
   constructor(
     private _route: ActivatedRoute,
     private _productsService: ProductsService,
     private _taskService: TasksService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const id = this._route.snapshot.paramMap.get('id');
@@ -73,23 +77,48 @@ export class ProductComponent implements OnInit {
     this.showConfirmationDialog = false;
   }
 
-  openCreateTaskModal () {
-    this.showCreateTaskModal = true;
-  }
+  openTaskModal(task: Task | null = null, index: number | null = null, event: Event | null = null): void {
+    if (task) {
+      event!.stopPropagation();
 
-  addTask() {
-    if (this.product$) {
-      this.product$.subscribe(product => {
-        product.tasks.push({ ...this.newTask, id: '' });
-        
-        this._taskService.create({ ...this.newTask, productId: product.id }).subscribe(() => {
-          this.closeTaskModal();
-        });
-      });
+      this.isEditing = true;
+      this.taskIndex = index;
+      this.newTask = task; // Prepopulate form with selected task
+      
+    } else {
+      this.isEditing = false;
+      this.taskIndex = null;
+      this.newTask = {     
+        title: '',
+        description: '',
+        dueAt: '',
+        productId: '' 
+      }; // Clear form
     }
+    this.showTaskModal = true;
   }
 
   closeTaskModal() {
-    this.showCreateTaskModal = false;
+    this.showTaskModal = false;
+    this.taskIndex = null;
+  }
+
+  saveTask(): void {
+    if (this.product$) {
+      this.product$.subscribe(product => {
+        if (this.isEditing && this.taskIndex !== null) {
+          this._taskService.update(this.newTask).subscribe(() => {
+            product.tasks[this.taskIndex!] = this.newTask;
+            this.closeTaskModal();
+          });
+
+        } else {
+          this._taskService.create({ ...this.newTask, productId: product.id }).subscribe(el => {
+            product.tasks.push(this.newTask);
+            this.closeTaskModal();
+          });
+        }
+      });
+    }
   }
 }

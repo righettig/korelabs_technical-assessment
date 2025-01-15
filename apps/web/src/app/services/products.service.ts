@@ -8,7 +8,7 @@ export type Product = {
   name: string;
   updatedAt: string;
   properties: Record<string, any>;
-  tasks: { id: string, title: string; description: string; dueAt: string }[];
+  tasks: { id?: string, title: string; description: string; dueAt: string, productId: string; }[];
 };
 
 @Injectable({

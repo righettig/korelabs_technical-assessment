@@ -90,13 +90,12 @@ export class ProductComponent implements OnInit {
     this.product$?.pipe(
       switchMap(product => {
         const taskOperation = this.isEditing && this.taskIndex !== null
-          ? this._taskService.update(this.newTask).pipe(
-              map(() => this.reloadCurrentProduct())
-            )
-          : this._taskService.create({ ...this.newTask, productId: product.id }).pipe(
-              map(() => this.reloadCurrentProduct())
-            );
-        return taskOperation;
+          ? this._taskService.update(this.newTask)
+          : this._taskService.create({ ...this.newTask, productId: product.id });
+          
+        return taskOperation.pipe(
+          map(() => this.reloadCurrentProduct())
+        );
       })
     ).subscribe(() => this.closeTaskModal());
   }

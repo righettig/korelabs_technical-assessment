@@ -19,6 +19,6 @@ export class Product {
   @UpdateDateColumn({ nullable: true })
   updatedAt?: Date;
 
-  @OneToMany(() => Task, (task) => task.product)
+  @OneToMany(() => Task, (task) => task.product, { onDelete: 'CASCADE' })
   tasks: Task[];
 }

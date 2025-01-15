@@ -11,8 +11,7 @@ type ProductWithTasks = Product & { tasks?: Task[] };
 @Injectable()
 export class ProductService {
   constructor(
-    @InjectRepository(Product) private _repository: Repository<Product>,
-    @InjectRepository(Task) private _taskRepository: Repository<Task>,
+    @InjectRepository(Product) private _repository: Repository<Product>
   ) {}
 
   create(createProductDto: CreateProductDto) {

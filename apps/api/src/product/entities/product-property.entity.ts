@@ -5,12 +5,12 @@ import { Product } from '../../product/entities/product.entity';
 export class ProductProperty {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
+ 
   @Column()
   key: string;
 
-  @Column('jsonb', { nullable: true })
-  value: any;
+  @Column()
+  value: string;
 
   @ManyToOne(() => Product, (product) => product.properties)
   product: Product;

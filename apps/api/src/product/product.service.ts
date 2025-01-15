@@ -7,7 +7,14 @@ import { Repository } from 'typeorm';
 import { Task } from '../task/entities/task.entity';
 import { ProductProperty } from './entities/product-property.entity';
 
-type ProductWithTasks = Product & { tasks?: Task[] };
+type ProductDto = {
+  id: string;
+  name: string;
+  properties: Record<string, any>;
+  createdAt: Date;
+  updatedAt?: Date;
+  tasks: Task[];
+}
 
 // TODO: update unit tests
 @Injectable()
@@ -37,17 +44,26 @@ export class ProductService {
     return product;
   }
 
-  async findAll() {
-    return this._repository.find({
+  async findAll(): Promise<ProductDto[]> {
+    let data = await this._repository.find({
       relations: ['tasks', 'properties'], // Automatically loads tasks and properties with each product
                                           // TypeORM will join the Task & Product Properties tables with Product in a single query, avoiding the need to loop and fetch tasks individually.
     });
 
-    // alternative solution
-    // return this._repository
-    //   .createQueryBuilder('product')
-    //   .leftJoinAndSelect('product.tasks', 'task')
-    //   .getMany()
+    // making sure return format is the same as before
+    const result = data.map(item => {
+      const propertiesObj = item.properties.reduce((acc, { key, value }) => {
+        acc[key] = value;
+        return acc;
+      }, {});
+      
+      return {
+        ...item,
+        properties: propertiesObj
+      };
+    });
+
+    return result;
   }
 
   // TODO: this need properties as well?

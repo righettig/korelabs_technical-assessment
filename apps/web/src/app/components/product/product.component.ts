@@ -114,7 +114,9 @@ export class ProductComponent implements OnInit {
 
         } else {
           this._taskService.create({ ...this.newTask, productId: product.id }).subscribe(el => {
-            product.tasks.push(this.newTask);
+            const id = this._route.snapshot.paramMap.get('id');
+            this.loadProduct(id!);
+
             this.closeTaskModal();
           });
         }

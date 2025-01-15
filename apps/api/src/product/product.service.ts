@@ -22,7 +22,14 @@ export class ProductService {
   async findAll() {
     return this._repository.find({
       relations: ['tasks'], // Automatically loads tasks with each product
+                            // TypeORM will join the Task table with Product in a single query, avoiding the need to loop and fetch tasks individually.
     });
+
+    // alternative solution
+    // return this._repository
+    //   .createQueryBuilder('product')
+    //   .leftJoinAndSelect('product.tasks', 'task')
+    //   .getMany()
   }
 
   findOne(id: string) {

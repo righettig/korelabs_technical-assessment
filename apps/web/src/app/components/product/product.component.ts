@@ -6,11 +6,21 @@ import { AsyncPipe, DatePipe, KeyValuePipe, NgFor, NgIf } from '@angular/common'
 import { Task, TasksService } from '../../services/tasks.service';
 import { ConfirmationDialogComponent } from '../confirmation-dialog/confirmation-dialog.component';
 import { FormsModule } from '@angular/forms';
+import { CreateEditTaskDialogComponent } from '../create-edit-task-dialog/create-edit-task-dialog.component';
 
 @Component({
   selector: 'app-product',
   standalone: true,
-  imports: [NgIf, NgFor, AsyncPipe, DatePipe, KeyValuePipe, ConfirmationDialogComponent, FormsModule],
+  imports: [
+    NgIf, 
+    NgFor, 
+    AsyncPipe, 
+    DatePipe, 
+    KeyValuePipe, 
+    ConfirmationDialogComponent, 
+    CreateEditTaskDialogComponent, 
+    FormsModule
+  ],
   templateUrl: './product.component.html',
   styleUrl: './product.component.scss',
 })
@@ -79,12 +89,12 @@ export class ProductComponent implements OnInit {
     this.newTask = this.createEmptyTask();
   }
 
-  saveTask(): void {
+  saveTask(newTask: Task): void {
     this.product$?.pipe(
       switchMap(product => {
         const taskOperation = this.isEditing && this.taskIndex !== null
-          ? this._taskService.update(this.newTask)
-          : this._taskService.create({ ...this.newTask, productId: product.id });
+          ? this._taskService.update(newTask)
+          : this._taskService.create({ ...newTask, productId: product.id });
           
         return taskOperation.pipe(
           map(() => this.reloadCurrentProduct())

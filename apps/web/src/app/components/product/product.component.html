@@ -63,56 +63,9 @@
   (cancel)="onDeleteTaskCancelled()">
 </app-confirmation-dialog>
 
-<!-- TODO: create separate component -->
-<div *ngIf="showTaskModal" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-  <div class="bg-white rounded-lg shadow-lg w-1/2 p-6">
-    <h3 class="text-lg font-bold mb-4">Add New Task</h3>
-    <form (ngSubmit)="saveTask()">
-      <div class="mb-4">
-        <label class="block text-sm font-bold mb-2">Title</label>
-        <input
-          type="text"
-          [(ngModel)]="newTask.title"
-          name="title"
-          class="w-full border border-gray-300 p-2 rounded"
-          required
-        />
-      </div>
-      <div class="mb-4">
-        <label class="block text-sm font-bold mb-2">Description</label>
-        <textarea
-          [(ngModel)]="newTask.description"
-          name="description"
-          class="w-full border border-gray-300 p-2 rounded"
-          rows="3"
-          required
-        ></textarea>
-      </div>
-      <div class="mb-4">
-        <label class="block text-sm font-bold mb-2">Due Date</label>
-        <input
-          type="datetime-local"
-          [(ngModel)]="newTask.dueAt"
-          name="dueAt"
-          class="w-full border border-gray-300 p-2 rounded"
-          required
-        />
-      </div>
-      <div class="flex justify-end">
-        <button
-          type="button"
-          class="bg-gray-500 text-white font-bold py-2 px-4 rounded mr-2"
-          (click)="closeTaskModal()"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          class="bg-blue-500 text-white font-bold py-2 px-4 rounded"
-        >
-          {{ isEditing ? 'Update Task' : 'Add Task' }}
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
+<app-create-edit-task-dialog *ngIf="showTaskModal"
+  [isEditing]="isEditing"
+  [task]="newTask"
+  (close)="closeTaskModal()"
+  (save)="saveTask($event)">
+</app-create-edit-task-dialog>

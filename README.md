@@ -33,11 +33,13 @@ There is also a couple of minor feature request we’d like you to complete. The
 1. Add task management to the product view
 
 ## Giacomo - Notes
+
+Running 'Migration1720026827434' fixes the "cannot delete product because of FK constraint with 'tasks' issue".
+
 1. DONE Fix db seed after having introduced product properties table
 2. DONE When clicking on a specific product all products are being queried again
 3. DONE Refactoring: create separate component for adding/editing a task
 4. DONE Fix front-end unit tests
 5. DONE Fix wrong modal title when editing task
-6. Fix seed db: add "on delete cascade" constraint for product/task
-7. Fix task due date not being displayed correctly when editing task
-8. Improve "Edit" icon
+6. Fix task due date not being displayed correctly when editing task
+7. Improve "Edit" icon

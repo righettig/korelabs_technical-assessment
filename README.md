@@ -40,3 +40,4 @@ There is also a couple of minor feature request we’d like you to complete. The
 5. Fix wrong modal title when editing task
 6. Fix task due date not being displayed correctly when editing task
 7. Improve "Edit" icon
+8. Fix seed db: add "on delete cascade" constraint for product/task

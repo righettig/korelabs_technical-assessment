@@ -22,9 +22,8 @@ export class ProductService {
   constructor(
     @InjectRepository(Product) private _repository: Repository<Product>,
     @InjectRepository(ProductProperty) private _propertyRepository: Repository<ProductProperty>
-  ) {}
+  ) { }
 
-  // TODO: check 'await'
   async create(createProductDto: CreateProductDto) {
     // Step 1: Save the product first
     const product = await this._repository.save(createProductDto);
@@ -45,36 +44,26 @@ export class ProductService {
   }
 
   async findAll(): Promise<ProductDto[]> {
-    let data = await this._repository.find({
-      relations: ['tasks', 'properties'], // Automatically loads tasks and properties with each product
-                                          // TypeORM will join the Task & Product Properties tables with Product in a single query, avoiding the need to loop and fetch tasks individually.
+    const products = await this._repository.find({
+      // Automatically loads tasks and properties with each product
+      // TypeORM will join the Task & Product Properties tables with Product in a single query, avoiding the need to loop and fetch tasks individually.
+      relations: ['tasks', 'properties'], 
     });
 
-    // making sure return format is the same as before
-    const result = data?.map(item => {
-      const propertiesObj = item.properties.reduce((acc, { key, value }) => {
-        acc[key] = value;
-        return acc;
-      }, {});
-      
-      return {
-        ...item,
-        properties: propertiesObj
-      };
-    });
-
-    return result;
+    return products.map(this.transformToProductDto);
   }
 
-  // TODO: this need properties as well?
-  // findOne(id: string) {
-  //   return this._repository.findOne({
-  //     where: { id },
-  //     relations: ['tasks', 'properties'],
-  //   });
-  // }
-  findOne(id: string) {
-    return this._repository.findOneBy({ id });
+  async findOne(id: string): Promise<ProductDto> {
+    let product = await this._repository.findOne({
+      where: { id },
+      relations: ['tasks', 'properties'],
+    });
+
+    if (!product) {
+      throw new Error(`Product with ID ${id} not found`);
+    }
+
+    return this.transformToProductDto(product);
   }
 
   update(id: string, updateProductDto: UpdateProductDto) {
@@ -83,5 +72,21 @@ export class ProductService {
 
   remove(id: string) {
     return this._repository.delete({ id });
+  }
+
+  private transformToProductDto(product: Product): ProductDto {
+    const properties = product.properties.reduce((acc, { key, value }) => {
+      acc[key] = value;
+      return acc;
+    }, {} as Record<string, any>);
+
+    return {
+      id: product.id,
+      name: product.name,
+      properties,
+      createdAt: product.createdAt,
+      updatedAt: product.updatedAt,
+      tasks: product.tasks,
+    };
   }
 }

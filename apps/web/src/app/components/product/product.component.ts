@@ -43,14 +43,7 @@ export class ProductComponent implements OnInit {
   }
 
   loadProduct(id: string) {
-    this.product$ = this._productsService
-      .findAll()
-      .pipe(
-        map(
-          (products: Product[]) =>
-            products.find((product) => product.id === id)!,
-        ),
-      );
+    this.product$ = this._productsService.findOne(id);
   }
 
   deleteTask(id: string, event: Event) {

@@ -34,7 +34,7 @@ There is also a couple of minor feature request we’d like you to complete. The
 
 ## Giacomo - Notes
 1. DONE Fix db seed after having introduced product properties table
-2. When clicking on a specific product all products are being queried again, i.e. introduce service to cache products on front-end
+2. DONE When clicking on a specific product all products are being queried again
 3. Refactoring: create separate component for adding/editing a task
 4. DONE Fix front-end unit tests
 5. Fix wrong modal title when editing task

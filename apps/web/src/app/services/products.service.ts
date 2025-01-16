@@ -23,6 +23,10 @@ export class ProductsService {
     return this._http.get<Product[]>(this._baseUrl);
   }
 
+  findOne(id: string): Observable<Product> {
+    return this._http.get<Product>(`${this._baseUrl}/${id}`);
+  }
+
   delete(id: string) {
     return this._http.delete(`${this._baseUrl}/${id}`);
   }

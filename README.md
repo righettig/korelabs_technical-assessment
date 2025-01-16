@@ -34,4 +34,6 @@ There is also a couple of minor feature request we’d like you to complete. The
 
 ## Giacomo - Notes
 1. DONE Fix db seed after having introduced product properties table
-2. Front-end unit tests
+2. When clicking on a specific product all products are being queried again, i.e. introduce service to cache products on front-end
+3. Front-end unit tests
+4. Improve Edit icon

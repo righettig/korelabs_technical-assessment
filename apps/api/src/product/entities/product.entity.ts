@@ -10,7 +10,7 @@ export class Product {
   @Column({ length: 255 })
   name: string;
 
-  @OneToMany(() => ProductProperty, (productProperty) => productProperty.product)
+  @OneToMany(() => ProductProperty, (productProperty) => productProperty.product, { cascade: true })
   properties: ProductProperty[];
 
   @CreateDateColumn({ update: false, nullable: false })

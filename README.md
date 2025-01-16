@@ -31,3 +31,7 @@ There is also a couple of minor feature request we’d like you to complete. The
 1. Normalise product properties into their own table, the `/products` api should return data in the same format to avoid the need to update the UI or version the API
 1. Add a confirmation dialog to the delete actions
 1. Add task management to the product view
+
+## Giacomo - Notes
+1. DONE Fix db seed after having introduced product properties table
+2. Front-end unit tests
